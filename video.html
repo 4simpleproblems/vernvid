@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vernvid - Watch</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <span class="logo"><a href="index.html" style="text-decoration:none;color:#ff0000;">Vernvid</a></span>
+    <form action="search.html" method="get" class="search-form">
+      <input type="text" name="q" class="search-bar" placeholder="Search Vernvid...">
+      <button type="submit">🔍</button>
+    </form>
+  </header>
+  <main>
+    <div id="playerContainer" style="max-width:900px;margin:2rem auto 1rem auto;"></div>
+    <div id="videoInfo" style="max-width:900px;margin:auto;"></div>
+  </main>
+  <script>
+    const API_KEY = 'AIzaSyADhMm4JwQdiGRQDI18uk-0juiYrFD-Oq0';
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+    const videoId = getQueryParam('id');
+    const playerContainer = document.getElementById('playerContainer');
+    const videoInfo = document.getElementById('videoInfo');
+
+    if (videoId) {
+      playerContainer.innerHTML = `
+        <iframe width="100%" height="500" src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+          frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      `;
+      // Fetch video details
+      fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.items.length > 0) {
+            const v = data.items[0];
+            videoInfo.innerHTML = `
+              <h2>${v.snippet.title}</h2>
+              <p style="color:#444;">By <b>${v.snippet.channelTitle}</b> &bull; ${Number(v.statistics.viewCount).toLocaleString()} views</p>
+              <p>${v.snippet.description.replace(/\n/g, "<br>")}</p>
+            `;
+          }
+        });
+    } else {
+      playerContainer.innerHTML = "<p>No video selected.</p>";
+    }
+  </script>
+</body>
+</html>
