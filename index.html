@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vernvid - Home</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <span class="logo">Vernvid</span>
+    <form action="search.html" method="get" class="search-form">
+      <input type="text" name="q" class="search-bar" placeholder="Search Vernvid...">
+      <button type="submit">🔍</button>
+    </form>
+  </header>
+  <main>
+    <h2 style="margin-left:2rem;">Trending</h2>
+    <div class="video-grid" id="videoContainer"></div>
+  </main>
+  <script>
+    const API_KEY = 'AIzaSyADhMm4JwQdiGRQDI18uk-0juiYrFD-Oq0';
+    const videoContainer = document.getElementById('videoContainer');
+
+    async function loadTrendingVideos() {
+      videoContainer.innerHTML = '<p>Loading...</p>';
+      try {
+        const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=US&maxResults=16&key=${API_KEY}`);
+        const data = await res.json();
+        videoContainer.innerHTML = data.items.map(video => `
+          <div class="video-card">
+            <a href="video.html?id=${video.id}">
+              <img class="video-thumb" src="${video.snippet.thumbnails.medium.url}" alt="${video.snippet.title}">
+              <div class="video-info">
+                <div class="video-title" title="${video.snippet.title}">${video.snippet.title}</div>
+                <div class="video-channel">${video.snippet.channelTitle}</div>
+              </div>
+            </a>
+          </div>
+        `).join('');
+      } catch (err) {
+        videoContainer.innerHTML = '<p>Error loading trending videos.</p>';
+      }
+    }
+
+    loadTrendingVideos();
+  </script>
+</body>
+</html>
